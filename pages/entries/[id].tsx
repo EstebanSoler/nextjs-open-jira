@@ -27,6 +27,7 @@ import { Entry, EntryStatus } from '../../interfaces';
 import { dbEntries } from '../../database';
 import { EntriesContext } from '../../context/entries';
 import { dateFunctions } from '../../utils';
+import router from 'next/router';
 
 const validStatus: EntryStatus[] = ['pending', 'in-progress', 'finished'];
 
@@ -36,7 +37,7 @@ interface Props {
 
 export const EntryPage: FC<Props> = ( {entry} ) => {
 
-  const { updateEntry } = useContext(EntriesContext);
+  const { updateEntry, deleteEntry } = useContext(EntriesContext);
 
   const [inputValue, setInputValue] = useState(entry.description);
   const [status, setStatus] = useState<EntryStatus>( entry.status  );
@@ -62,6 +63,19 @@ export const EntryPage: FC<Props> = ( {entry} ) => {
     }
     
     updateEntry( updatedEntry, true) ;
+  }
+
+  const onDelete = () => {
+    if( inputValue.trim().length === 0 ) return;
+
+    const updatedEntry: Entry = {
+      ...entry,
+      status,
+      description: inputValue,
+    }
+    
+    deleteEntry( updatedEntry, true) ;
+    router.push(`/`);
   }
 
 
@@ -128,12 +142,15 @@ export const EntryPage: FC<Props> = ( {entry} ) => {
         </Grid>
         
       </Grid>
-      <IconButton sx={{
-        position:'fixed',
-        botton: 30,
-        right: 30,
-        backgroundColor: 'error.dark',
-      }}>
+      <IconButton 
+        sx={{
+          position:'fixed',
+          botton: 30,
+          right: 30,
+          backgroundColor: 'error.dark',
+        }}
+        onClick={ onDelete }
+      >
         <DeleteOutlineIcon />
       </IconButton>
     </Layout>
